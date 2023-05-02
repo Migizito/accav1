@@ -1,5 +1,49 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
 .App {
   text-align: center;
+}
+
+.navbar{
+  background-color: #222529;
+  padding: 1rem 2rem;
+  color: aliceblue ;
+}
+
+.sidebar{
+  width: 14rem;
+  height: calc(100vh - 52px);
+}
+
+.sidebar ul{
+  list-style: none;
+  padding: 1rem 2rem;
+}
+
+.sidebar ul li{
+  margin-bottom: 1rem;
+}
+
+.sidebar ul li a{
+  text-decoration: none;
+  color: aliceblue;
+}
+
+.sidebar ul li a :hover{
+  text-decoration: none;
+}
+
+.flex{
+  display: flex;
+}
+
+.content{
+  width: 100%;
+  justify-content: center;
+  align-items: center;
 }
 
 .App-logo {
