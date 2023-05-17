@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { show_alert } from "../functions";
+import { ClientsCategory } from "./enums";
 
 export const ShowClients = () => {
   const url = "https://api-acca.azurewebsites.net";
@@ -177,7 +178,7 @@ export const ShowClients = () => {
                     <tr key={client.id}>
                       <td>{client.id}</td>
                       <td>{client.name}</td>
-                      <td>{client.clienteCategory}</td>
+                      <td>{ClientsCategory[client.clienteCategory]}</td>
                       <td>
                         <button
                           onClick={() =>
@@ -185,7 +186,7 @@ export const ShowClients = () => {
                               2,
                               client.id,
                               client.name,
-                              client.category
+                              ClientsCategory[client.clienteCategory]
                             )
                           }
                           className="btn btn-warning"
@@ -251,12 +252,12 @@ export const ShowClients = () => {
                   aria-label=".form-select-sm example"
                 >
                   <option selected>Selecciona Categoría</option>
-                  <option value={1}>Categoría 1</option>
-                  <option value={2}>Categoría 2</option>
-                  <option value={3}>Categoría 3</option>
-                  <option value={4}>Categoría 4</option>
-                  <option value={5}>Categoría 5</option>
-                  <option value={6}>Categoría 6</option>
+                  <option value={1}>Gobierno</option>
+                  <option value={2}>Industria</option>
+                  <option value={3}>Petróleo</option>
+                  <option value={4}>Comercio</option>
+                  <option value={5}>Banco</option>
+                  <option value={6}>Seguros</option>
                 </select>
               </div>
               <div className="d-grid col-6 mx-auto">
