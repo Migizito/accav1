@@ -7,16 +7,33 @@ import { ClientsCategory } from "./enums";
 export const ShowClients = () => {
   const url = "https://api-acca.azurewebsites.net";
   const [clients, setClients] = useState([]);
+  const [tablaCliente, setTablaCliente] = useState([]); // eslint-disable-line no-unused-vars
   const [id, setId] = useState("");
   const [name, setName] = useState("");
   const [category, setCategory] = useState(1);
   const [response, setResponse] = useState(null);
   const [operation, setOperation] = useState(1);
   const [title, setTitle] = useState("");
+  const [busqueda, setBusqueda]= useState("");
 
   useEffect(() => {
     handleGetClients();
   }, []);
+
+  const handleChange=(e)=>{
+    setBusqueda(e.target.value);
+    filtrar(e.target.value);
+  }
+
+  const filtrar=(terminoBusqueda)=>{
+    var resultadosBusqueda=tablaCliente.filter((client)=>{
+      if(client.name.toString().toLowerCase().includes(terminoBusqueda.toLowerCase())
+      ){
+        return client;
+      }
+    });
+    setClients(resultadosBusqueda);
+  }
 
   async function handleCreateClient() {
     const data = {
@@ -55,6 +72,7 @@ export const ShowClients = () => {
     );
     const data = await response.json();
     setClients(data);
+    setTablaCliente(data);
   }
 
   async function handleUpdateClient(client) {
@@ -162,6 +180,17 @@ export const ShowClients = () => {
             </div>
           </div>
         </div>
+        <div className="containerInput">
+        <input
+          className="form-control inputBuscar"
+          value={busqueda}
+          placeholder="Búsqueda"
+          onChange={handleChange}
+        />
+        <button className="btn btn-success">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        </button>
+      </div>
         <div className="row mt-3">
           <div className="tabla">
             <div className="table-responsive">
@@ -174,7 +203,7 @@ export const ShowClients = () => {
                   </tr>
                 </thead>
                 <tbody className="table-group-divider">
-                  {clients.map((client) => (
+                  {clients && clients.map((client) => (
                     <tr key={client.id}>
                       <td>{client.id}</td>
                       <td>{client.name}</td>

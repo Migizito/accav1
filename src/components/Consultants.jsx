@@ -7,16 +7,33 @@ export const Consultants = () => {
 
     const url = "https://api-acca.azurewebsites.net";
     const [consultants, setConsultants] = useState([]);
+    const [tableConsultants, setTableConsultants] = useState([]);
     const [id, setId] = useState("");
     const [name, setName] = useState("");
     const [response, setResponse] = useState(null);
     const [operation, setOperation] = useState(1);
     const [title, setTitle] = useState("");
-  
+    const [busqueda, setBusqueda]= useState("");
+
     useEffect(() => {
       handleGetConsultants();
     }, []);
   
+    const handleChange=(e)=>{
+      setBusqueda(e.target.value);
+      filtrar(e.target.value);
+    }
+
+    const filtrar=(terminoBusqueda)=>{
+      var resultadosBusqueda=tableConsultants.filter((consultant)=>{
+        if(consultant.name.toString().toLowerCase().includes(terminoBusqueda.toLowerCase())
+        ){
+          return consultant;
+        }
+      });
+      setConsultants(resultadosBusqueda);
+    }
+
     async function handleCreateConsultant() {
       const data = {
         id: id,
@@ -53,6 +70,7 @@ export const Consultants = () => {
       );
       const data = await response.json();
       setConsultants(data);
+      setTableConsultants(data);
     }
   
     async function handleUpdateConsultants(consultant) {
@@ -157,6 +175,17 @@ export const Consultants = () => {
             </div>
           </div>
         </div>
+        <div className="containerInput">
+        <input
+          className="form-control inputBuscar"
+          value={busqueda}
+          placeholder="Búsqueda"
+          onChange={handleChange}
+        />
+        <button className="btn btn-success">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        </button>
+      </div>
         <div className="row mt-3">
           <div className="tabla">
             <div className="table-responsive">

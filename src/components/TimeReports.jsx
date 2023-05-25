@@ -6,6 +6,7 @@ import { show_alert } from "../functions";
 export const TimeReports = () => {
   const url = "https://api-acca.azurewebsites.net";
     const [reports, setReports] = useState([]);
+    const [tableReports, setTableReports] = useState([]);
     const [id, setId] = useState("");
     const [clientName, setClientName] = useState("");
     const [consultantName, setConsultantName] = useState("");
@@ -26,10 +27,27 @@ export const TimeReports = () => {
     const [response, setResponse] = useState(null);
     const [operation, setOperation] = useState(1);
     const [title, setTitle] = useState("");
+    const [busqueda, setBusqueda]= useState("");
   
     useEffect(() => {
       handleGetReports();
     }, []);
+
+    const handleChange=(e)=>{
+      setBusqueda(e.target.value);
+      filtrar(e.target.value);
+    }
+
+    const filtrar=(terminoBusqueda)=>{
+      var resultadosBusqueda=tableReports.filter((report)=>{
+        if(report.clientName.toString().toLowerCase().includes(terminoBusqueda.toLowerCase())
+        ){
+          return report;
+        }
+      });
+      setReports(resultadosBusqueda);
+    }
+
   
     async function handleCreateReport() {
       const data = {
@@ -82,6 +100,7 @@ export const TimeReports = () => {
       );
       const data = await response.json();
       setReports(data);
+      setTableReports(data);
     }
   
     async function handleUpdateReports(report) {
@@ -216,6 +235,17 @@ export const TimeReports = () => {
             </div>
           </div>
         </div>
+        <div className="containerInput">
+        <input
+          className="form-control inputBuscar"
+          value={busqueda}
+          placeholder="Búsqueda"
+          onChange={handleChange}
+        />
+        <button className="btn btn-success">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        </button>
+      </div>
         <div className="row mt-3">
           <div className="tabla">
             <div className="table-responsive">

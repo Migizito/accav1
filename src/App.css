@@ -80,3 +80,14 @@
     transform: rotate(360deg);
   }
 }
+
+.inputBuscar {
+  width: 50%;
+}
+
+.containerInput {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 2rem;
+}

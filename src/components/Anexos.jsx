@@ -6,6 +6,7 @@ import { show_alert } from "../functions";
 export const Anexos = () => {
   const url = "https://api-acca.azurewebsites.net";
     const [appendixes, setAppendixes] = useState([]);
+    const [tableAppendixes, setTableAppendixes] = useState([]);
     const [id, setId] = useState("");
     const [projectName, setProjectName] = useState("");
     const [assignment, setAssignment] = useState("");
@@ -18,11 +19,27 @@ export const Anexos = () => {
     const [response, setResponse] = useState(null);
     const [operation, setOperation] = useState(1);
     const [title, setTitle] = useState("");
+    const [busqueda, setBusqueda]= useState("");
   
     useEffect(() => {
       handleGetAppendixes();
     }, []);
   
+    const handleChange=(e)=>{
+      setBusqueda(e.target.value);
+      filtrar(e.target.value);
+    }
+
+    const filtrar=(terminoBusqueda)=>{
+      var resultadosBusqueda=tableAppendixes.filter((appendix)=>{
+        if(appendix.clientName.toString().toLowerCase().includes(terminoBusqueda.toLowerCase())
+        ){
+          return appendix;
+        }
+      });
+      setAppendixes(resultadosBusqueda);
+    }
+
     async function handleCreateAppendix() {
       const data = {
         id: id,
@@ -66,6 +83,7 @@ export const Anexos = () => {
       );
       const data = await response.json();
       setAppendixes(data);
+      setTableAppendixes(data);
     }
   
     async function handleUpdateAppendixes(appendix) {
@@ -191,6 +209,17 @@ export const Anexos = () => {
             </div>
           </div>
         </div>
+        <div className="containerInput">
+        <input
+          className="form-control inputBuscar"
+          value={busqueda}
+          placeholder="Búsqueda"
+          onChange={handleChange}
+        />
+        <button className="btn btn-success">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        </button>
+      </div>
         <div className="row mt-3">
           <div className="tabla">
             <div className="table-responsive">
