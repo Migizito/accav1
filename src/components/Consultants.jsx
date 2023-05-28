@@ -73,14 +73,15 @@ export const Consultants = () => {
       setTableConsultants(data);
     }
   
-    async function handleUpdateConsultants(consultant) {
+    async function handleUpdateConsultants(id, name) {
       const data = {
-        id: consultant.id,
-        name: consultant.name,
+        id: id,
+        name: name,
       };
   
-      const response = await fetch(
-        `https://api-acca.azurewebsites.net/UpdateConsultant/${consultant.id}`,
+      try {
+        const response = await fetch(
+          `https://api-acca.azurewebsites.net/EditConsultantById/${id}`,
         {
           method: "PUT",
           headers: {
@@ -88,20 +89,27 @@ export const Consultants = () => {
           },
           body: JSON.stringify(data),
         }
-      );
-  
-      const responseData = await response.json();
-      setResponse(responseData);
-  
-      // Actualizar la lista de clientes después de actualizar uno existente
-      handleGetConsultants();
+        );
+    
+        if (response.ok) {
+          // Actualización exitosa
+          handleGetConsultants();
   
       // Mostrar alerta
       Swal.fire({
         icon: "success",
-        title: "¡Consultor actualizado!",
-        text: "El consultor se ha actualizado correctamente.",
+        title: "¡Cliente actualizado!",
+        text: "El cliente se ha actualizado correctamente.",
       });
+          // Aquí puedes realizar cualquier otra acción necesaria después de la actualización exitosa
+        } else {
+          // Manejo de errores si la respuesta no es exitosa
+          console.log("Error al actualizar el cliente");
+        }
+      } catch (error) {
+        // Manejo de errores en caso de una excepción durante la petición
+        console.log("Error en la petición: ", error);
+      }
     }
   
     async function handleDeleteConsultants(consultant) {
@@ -142,7 +150,7 @@ export const Consultants = () => {
       return { isValid, errors };
     }
   
-    const openModal = (op, id, name, category) => {
+    const openModal = (op, id, name) => {
       setId("");
       setName("");
       setOperation(op);
@@ -215,7 +223,7 @@ export const Consultants = () => {
                           <i
                             className="fa-solid fa-edit"
                             data-bs-toggle="modal"
-                            data-bs-target="#modalProducts"
+                            data-bs-target="#modalConsultants"
                           ></i>
                         </button>
                         &nbsp;
@@ -230,6 +238,55 @@ export const Consultants = () => {
                   ))}
                 </tbody>
               </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="modalConsultants" className="modal fade" aria-hidden="true">
+        <div className="modal-dialog">
+          <div className="modal-content">
+            <div className="modal-header">
+              <label className="h5">{title}</label>
+              <button
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div className="modal-body">
+              <input type="hidden" id="id"></input>
+              <div className="input-group mb-3">
+                <span className="input-group-text">
+                  <i className="fa-solid fa-gift"></i>
+                </span>
+                <input
+                  type="text"
+                  id="nombre"
+                  className="form-control"
+                  placeholder="Nombre"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                ></input>
+              </div>
+              <div className="d-grid col-6 mx-auto">
+                <button
+                  onClick={() => handleUpdateConsultants(id, name)}
+                  className="btn btn-success"
+                >
+                  <i className="fa-solid fa-check"></i>Editar
+                </button>
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button
+                type="button"
+                id="btnClose"
+                className="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                Cerrar
+              </button>
             </div>
           </div>
         </div>

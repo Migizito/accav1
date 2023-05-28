@@ -352,7 +352,7 @@ export const Contracts = () => {
                   id="category"
                   value={clienteName}
                   onChange={(e) => setClienteName(e.target.value)}
-                  class="form-select form-select-sm"
+                  class="form-control form-control-sm"
                   aria-label=".form-select-sm example"
                 >
                   <option selected>Selecciona Cliente</option>
