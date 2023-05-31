@@ -11,7 +11,6 @@ export const Contracts = () => {
   const [contracts, setContracts] = useState([]);
   const [tableContracts, setTableContracts] = useState([]);
   const [id, setId] = useState("");
-  const [clase, setClase] = useState("");
   const [clienteName, setClienteName] = useState("");
   const [montoMax, setMontoMax] = useState("");
   const [fianza, setFianza] = useState(true);
@@ -55,7 +54,6 @@ export const Contracts = () => {
   async function handleCreateContracts() {
     const data = {
       id: id,
-      clase: clase,
       clienteName: clienteName,
       montoMax: montoMax,
       fianza: fianza,
@@ -106,7 +104,6 @@ export const Contracts = () => {
   async function handleUpdateContracts(contract) {
     const data = {
       id: contract.id,
-      clase: contract.clase,
       clienteName: contract.clienteName,
       montoMax: contract.montoMax,
       fianza: contract.fianza,
@@ -185,7 +182,6 @@ export const Contracts = () => {
 
   const openModal = (op, id, name, category) => {
     setId("");
-    setClase("");
     setMontoMax("");
     setFianza(true);
     setClienteName("");
@@ -195,13 +191,12 @@ export const Contracts = () => {
     } else if (op === 2) {
       setTitle("Editar Contrato");
       setId(id);
-      setClase("");
       setMontoMax("");
       setFianza(true);
       setClienteName("");
     }
     window.setTimeout(() => {
-      document.getElementById("clase").focus();
+      document.getElementById("montoMax").focus();
     }, 500);
   };
   return (
@@ -239,7 +234,6 @@ export const Contracts = () => {
                 <thead>
                   <tr>
                     <th>#</th>
-                    <th>CLASE</th>
                     <th>MONTO</th>
                     <th>FIANZA</th>
                     <th>CLIENTE</th>
@@ -250,7 +244,6 @@ export const Contracts = () => {
                     contracts.map((contract) => (
                       <tr key={contract.id}>
                         <td>{contract.id}</td>
-                        <td>{contract.clase}</td>
                         <td>{contract.montoMax}</td>
                         <td>{fianzaValidator(contract.fianza)}</td>
                         <td>{contract.clienteName}</td>
@@ -260,7 +253,6 @@ export const Contracts = () => {
                               openModal(
                                 2,
                                 contract.id,
-                                contract.clase,
                                 contract.montoMax,
                                 contract.fianza,
                                 contract.clienteName
@@ -306,20 +298,7 @@ export const Contracts = () => {
               <input type="hidden" id="id"></input>
               <div className="input-group mb-3">
                 <span className="input-group-text">
-                  <i className="fa-solid fa-gift"></i>
-                </span>
-                <input
-                  type="text"
-                  id="clase"
-                  className="form-control"
-                  placeholder="Clase"
-                  value={clase}
-                  onChange={(e) => setClase(e.target.value)}
-                ></input>
-              </div>
-              <div className="input-group mb-3">
-                <span className="input-group-text">
-                  <i className="fa-solid fa-gift"></i>
+                <i class="fa-solid fa-money-bills"></i>
                 </span>
                 <input
                   type="text"
@@ -332,7 +311,7 @@ export const Contracts = () => {
               </div>
               <div className="input-group mb-3">
                 <span className="input-group-text">
-                  <i className="fa-solid fa-gift"></i>
+                <i class="fa-solid fa-sack-dollar"></i>
                 </span>
                 <input
                   type="text"
@@ -342,17 +321,22 @@ export const Contracts = () => {
                   value={fianza}
                   onChange={(e) => setFianza(e.target.value)}
                 ></input>
-              </div>
+              </div>        
               <div className="input-group mb-3">
                 <span className="input-group-text">
-                  <i className="fa-solid fa-comment"></i>
+                <i class="fa-solid fa-magnifying-glass"></i>
                 </span>
-                <input type="text" value={searchTerm} onChange={handleInputChange} placeholder="Buscar..." />
+                  <input type="text" className="form-control" value={searchTerm} onChange={handleInputChange} placeholder="Buscar Cliente..." />
+              </div>
+                <div className="input-group mb-3">
+                <span className="input-group-text">
+                <i class="fa-solid fa-user-plus"></i>
+                </span>
                 <select
                   id="category"
                   value={clienteName}
                   onChange={(e) => setClienteName(e.target.value)}
-                  class="form-control form-control-sm"
+                  class="form-select"
                   aria-label=".form-select-sm example"
                 >
                   <option selected>Selecciona Cliente</option>

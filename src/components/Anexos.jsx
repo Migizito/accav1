@@ -5,15 +5,24 @@ import { show_alert } from "../functions";
 
 export const Anexos = () => {
   const url = "https://api-acca.azurewebsites.net";
+  const [searchService, setSearchService] = useState("");
+  const [searchConsultant, setSearchConsultant] = useState("");
+  const [searchContract, setSearchContract] = useState("");
     const [appendixes, setAppendixes] = useState([]);
     const [tableAppendixes, setTableAppendixes] = useState([]);
+    const [services, setServices] = useState([]);
+    const [tableServices, setTableServices] = useState([]);
+    const [consultants, setConsultants] = useState([]);
+    const [tableConsultants, setTableConsultants] = useState([]);
+    const [contracts, setContracts] = useState([]);
+    const [tableContracts, setTableContracts] = useState([]);
     const [id, setId] = useState("");
     const [projectName, setProjectName] = useState("");
+    const [serviceName, setServiceName] = useState("");	
     const [assignment, setAssignment] = useState("");
     const [consultorName, setConsultorName] = useState("");
     const [horasTrabajadas, setHorasTrabajadas] = useState("");
     const [costoEstimado, setCostoEstimado] = useState("");
-    const [montoFacturado, setMontoFacturado] = useState("");
     const [clientName, setClientName] = useState("");
     const [contractId, setContractId] = useState("");
     const [response, setResponse] = useState(null);
@@ -23,6 +32,9 @@ export const Anexos = () => {
   
     useEffect(() => {
       handleGetAppendixes();
+      handleGetServices();
+      handleGetConsultants();
+      handleGetContracts();
     }, []);
   
     const handleChange=(e)=>{
@@ -32,24 +44,41 @@ export const Anexos = () => {
 
     const filtrar=(terminoBusqueda)=>{
       var resultadosBusqueda=tableAppendixes.filter((appendix)=>{
-        if(appendix.clientName.toString().toLowerCase().includes(terminoBusqueda.toLowerCase())
+        if(appendix.consultorName.toString().toLowerCase().includes(terminoBusqueda.toLowerCase())
         ){
           return appendix;
         }
       });
       setAppendixes(resultadosBusqueda);
     }
+    const filteredOptionsService = services.filter((service) =>
+    service.name.toLowerCase().includes(searchService.toLowerCase())
+  );
+
+  const filteredOptionsConsultant = consultants.filter((consultant) =>
+    consultant.name.toLowerCase().includes(searchConsultant.toLowerCase())
+  );
+
+  const handleInputChange = (event) => {
+    setSearchService(event.target.value);
+  };
+  const handleInputChange2 = (event) => {
+    setSearchConsultant(event.target.value);
+  };
+  const handleInputChange3 = (event) => {
+    setSearchContract(event.target.value);
+  };
+    
 
     async function handleCreateAppendix() {
       const data = {
         id: id,
         projectName: projectName,
+        serviceName: serviceName,
         assignment: assignment,
         consultorName: consultorName,
         horasTrabajadas: horasTrabajadas,
         costoEstimado: costoEstimado,
-        montoFacturado: montoFacturado,
-        clientName: clientName,
         contractId: contractId,
       };
   
@@ -85,22 +114,48 @@ export const Anexos = () => {
       setAppendixes(data);
       setTableAppendixes(data);
     }
-  
+
+    async function handleGetConsultants() {
+      const response = await fetch(
+        "https://api-acca.azurewebsites.net/GetConsultants"
+      );
+      const data = await response.json();
+      setConsultants(data);
+      setTableConsultants(data);
+    }
+
+    async function handleGetServices() {
+      const response = await fetch(
+        "https://api-acca.azurewebsites.net/GetServices"
+      );
+      const data = await response.json();
+      setServices(data);
+      setTableServices(data);
+    }
+
+    async function handleGetContracts() {
+      const response = await fetch(
+        "https://api-acca.azurewebsites.net/GetContracts"
+      );
+      const data = await response.json();
+      setContracts(data);
+      setTableContracts(data);
+    }
+
     async function handleUpdateAppendixes(appendix) {
       const data = {
         id: appendix.id,
         projectName: appendix.projectName,
+        serviceName: appendix.serviceName,
         assignment: appendix.assignment,
         consultorName: appendix.consultorName,
         horasTrabajadas: appendix.horasTrabajadas,
         costoEstimado: appendix.costoEstimado,
-        montoFacturado: appendix.montoFacturado,
-        clientName: appendix.clientName,
         contractId: appendix.contractId,
       };
   
       const response = await fetch(
-        `https://api-acca.azurewebsites.net/UpdateAppendix/${appendix.id}`,
+        `https://api-acca.azurewebsites.net/EditAppendixById/${appendix.id}`,
         {
           method: "PUT",
           headers: {
@@ -162,30 +217,28 @@ export const Anexos = () => {
       return { isValid, errors };
     }
   
-    const openModal = (op, id, projectName, category) => {
+    const openModal = (op, id, projectName, assignment, serviceName, consultorName, horasTrabajadas,costoEstimado, contractId) => {
       setId("");
       setProjectName("");
+      setServiceName("");
       setAssignment("");
       setConsultorName("");
       setHorasTrabajadas("");
       setCostoEstimado("");
-      setMontoFacturado("");
-      setClientName("");
       setContractId("");
       setOperation(op);
       if (op === 1) {
-        setTitle("Agregar Consultor");
+        setTitle("Agregar Anexo");
       } else if (op === 2) {
-        setTitle("Editar Consultor");
+        setTitle("Editar Anexo");
         setId(id);
         setProjectName(projectName);
-      setAssignment("");
-      setConsultorName("");
-      setHorasTrabajadas("");
-      setCostoEstimado("");
-      setMontoFacturado("");
-      setClientName("");
-      setContractId("");
+      setAssignment(assignment);
+      setServiceName(serviceName);
+      setConsultorName(consultorName);
+      setHorasTrabajadas(horasTrabajadas);
+      setCostoEstimado(costoEstimado);
+      setContractId(contractId);
       }
       window.setTimeout(() => {
         document.getElementById("nombre").focus();
@@ -228,12 +281,11 @@ export const Anexos = () => {
                   <tr>
                     <th>#</th>
                     <th>PROYECTO</th>
+                    <th>SERVICIO</th>
                     <th>ASIGNACION</th>
                     <th>CONSULTOR</th>
                     <th>HORAS TRABAJADAS</th>
                     <th>COSTO</th>
-                    <th>MONTO</th>
-                    <th>CLIENTE</th>
                     <th>CONTRATO</th>
                   </tr>
                 </thead>
@@ -242,12 +294,11 @@ export const Anexos = () => {
                     <tr key={appendix.id}>
                       <td>{appendix.id}</td>
                       <td>{appendix.projectName}</td>
+                      <td>{appendix.serviceName}</td>
                       <td>{appendix.assignment}</td>
                       <td>{appendix.consultorName}</td>
                       <td>{appendix.horasTrabajadas}</td>
                       <td>{appendix.costoEstimado}</td>
-                      <td>{appendix.montoFacturado}</td>
-                      <td>{appendix.clientName}</td>
                       <td>{appendix.contractId}</td>
                       <td>
                         <button
@@ -256,6 +307,12 @@ export const Anexos = () => {
                               2,
                               appendix.id,
                               appendix.projectName,
+                              appendix.serviceName,
+                              appendix.assignment,
+                              appendix.consultorName,
+                              appendix.horasTrabajadas,
+                              appendix.costoEstimado,
+                              appendix.contractId
                             )
                           }
                           className="btn btn-warning"
@@ -298,7 +355,7 @@ export const Anexos = () => {
               <input type="hidden" id="id"></input>
               <div className="input-group mb-3">
                 <span className="input-group-text">
-                  <i className="fa-solid fa-gift"></i>
+                <i class="fa-solid fa-circle-nodes"></i>
                 </span>
                 <input
                   type="text"
@@ -311,33 +368,81 @@ export const Anexos = () => {
               </div>
               <div className="input-group mb-3">
                 <span className="input-group-text">
-                  <i className="fa-solid fa-gift"></i>
+                  <i class="fa-solid fa-magnifying-glass"></i>
                 </span>
+                <input
+                  type="text"
+                  className="form-control"
+                  value={searchService}
+                  onChange={handleInputChange}
+                  placeholder="Buscar Servicio..."
+                />
+              </div>
+              <div className="input-group mb-3">
+                <span className="input-group-text">
+                  <i class="fa-solid fa-user-plus"></i>
+                </span>
+                <select
+                  id="serviceName"
+                  value={serviceName}
+                  onChange={(e) => setServiceName(e.target.value)}
+                  class="form-select"
+                  aria-label=".form-select-sm example"
+                >
+                  <option selected>Selecciona Servicio</option>
+                  {filteredOptionsService.map((service) => (
+                    <option key={service.id} value={service.name}>
+                      {service.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="input-group mb-3">
+                <span className="input-group-text">
+                <i class="fa-sharp fa-solid fa-link"></i>                </span>
                 <input
                   type="text"
                   id="assignment"
                   className="form-control"
                   placeholder="Asignacion"
                   value={assignment}
-                  onChange={(e) => setAssignment(e.target.value)}
+                  onChange={(e) => setAssignment(parseInt(e.target.value))}
                 ></input>
               </div>
               <div className="input-group mb-3">
                 <span className="input-group-text">
-                  <i className="fa-solid fa-gift"></i>
+                  <i class="fa-solid fa-magnifying-glass"></i>
                 </span>
                 <input
                   type="text"
-                  id="consultorName"
                   className="form-control"
-                  placeholder="Nombre de Consultor"
-                  value={consultorName}
-                  onChange={(e) => setConsultorName(e.target.value)}
-                ></input>
+                  value={searchConsultant}
+                  onChange={handleInputChange2}
+                  placeholder="Buscar Consultor..."
+                />
               </div>
               <div className="input-group mb-3">
                 <span className="input-group-text">
-                  <i className="fa-solid fa-gift"></i>
+                  <i class="fa-solid fa-user-plus"></i>
+                </span>
+                <select
+                  id="consultorName"
+                  value={consultorName}
+                  onChange={(e) => setConsultorName(e.target.value)}
+                  class="form-select"
+                  aria-label=".form-select-sm example"
+                >
+                  <option selected>Selecciona Consultor</option>
+                  {filteredOptionsConsultant.map((consultant) => (
+                    <option key={consultant.id} value={consultant.name}>
+                      {consultant.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="input-group mb-3">
+                <span className="input-group-text">
+                <i class="fa-solid fa-clock"></i>
                 </span>
                 <input
                   type="text"
@@ -345,12 +450,12 @@ export const Anexos = () => {
                   className="form-control"
                   placeholder="Horas Trabajadas"
                   value={horasTrabajadas}
-                  onChange={(e) => setHorasTrabajadas(e.target.value)}
+                  onChange={(e) => setHorasTrabajadas(parseInt(e.target.value))}
                 ></input>
               </div>
               <div className="input-group mb-3">
                 <span className="input-group-text">
-                  <i className="fa-solid fa-gift"></i>
+                <i class="fa-solid fa-money-check-dollar"></i>
                 </span>
                 <input
                   type="text"
@@ -363,42 +468,22 @@ export const Anexos = () => {
               </div>
               <div className="input-group mb-3">
                 <span className="input-group-text">
-                  <i className="fa-solid fa-gift"></i>
+                  <i class="fa-solid fa-user-plus"></i>
                 </span>
-                <input
-                  type="text"
-                  id="montoFacturado"
-                  className="form-control"
-                  placeholder="Monto Facturado"
-                  value={montoFacturado}
-                  onChange={(e) => setMontoFacturado(e.target.value)}
-                ></input>
-              </div>
-              <div className="input-group mb-3">
-                <span className="input-group-text">
-                  <i className="fa-solid fa-gift"></i>
-                </span>
-                <input
-                  type="text"
-                  id="clientName"
-                  className="form-control"
-                  placeholder="Nombre de Cliente"
-                  value={clientName}
-                  onChange={(e) => setClientName(e.target.value)}
-                ></input>
-              </div>
-              <div className="input-group mb-3">
-                <span className="input-group-text">
-                  <i className="fa-solid fa-gift"></i>
-                </span>
-                <input
-                  type="text"
+                <select
                   id="contractId"
-                  className="form-control"
-                  placeholder="Contrato"
                   value={contractId}
-                  onChange={(e) => setContractId(e.target.value)}
-                ></input>
+                  onChange={(e) => setContractId(parseInt(e.target.value))}
+                  class="form-select"
+                  aria-label=".form-select-sm example"
+                >
+                  <option selected>Selecciona Contrato</option>
+                  {contracts.map((contract) => (
+                    <option key={contract.id} value={contract.id}>
+                      {contract.id}
+                    </option>
+                  ))}
+                </select>
               </div>
               <div className="d-grid col-6 mx-auto">
                 <button

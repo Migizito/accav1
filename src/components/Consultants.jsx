@@ -98,13 +98,13 @@ export const Consultants = () => {
       // Mostrar alerta
       Swal.fire({
         icon: "success",
-        title: "¡Cliente actualizado!",
-        text: "El cliente se ha actualizado correctamente.",
+        title: "Consultor actualizado!",
+        text: "El consultor se ha actualizado correctamente.",
       });
           // Aquí puedes realizar cualquier otra acción necesaria después de la actualización exitosa
         } else {
           // Manejo de errores si la respuesta no es exitosa
-          console.log("Error al actualizar el cliente");
+          console.log("Error al actualizar el consultor");
         }
       } catch (error) {
         // Manejo de errores en caso de una excepción durante la petición
@@ -258,7 +258,7 @@ export const Consultants = () => {
               <input type="hidden" id="id"></input>
               <div className="input-group mb-3">
                 <span className="input-group-text">
-                  <i className="fa-solid fa-gift"></i>
+                <i class="fa-solid fa-user"></i>
                 </span>
                 <input
                   type="text"
@@ -307,7 +307,7 @@ export const Consultants = () => {
               <input type="hidden" id="id"></input>
               <div className="input-group mb-3">
                 <span className="input-group-text">
-                  <i className="fa-solid fa-gift"></i>
+                <i class="fa-solid fa-user"></i>
                 </span>
                 <input
                   type="text"

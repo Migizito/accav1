@@ -49,6 +49,11 @@ export const Sidebar = () => {
                   <IconName.FaRegTimesCircle className="me-2" /> Reportes
                 </Link>
               </li>
+              <li>
+                <Link to="/servicios">
+                  <IconName.FaServicestack className="me-2" /> Servicios
+                </Link>
+              </li>
             </ul>
           </div>
         </div>

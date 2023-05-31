@@ -2,82 +2,99 @@ import React, { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { show_alert } from "../functions";
-import { ClientsCategory } from "./enums";
+import { useParams } from "react-router-dom";
 
-export const ShowClients = () => {
+export const Activities = () => {
   const url = "https://api-acca.azurewebsites.net";
-  const [clients, setClients] = useState([]);
-  const [tablaCliente, setTablaCliente] = useState([]); // eslint-disable-line no-unused-vars
+  const [activities, setActivities] = useState([]);
+  const [tableActivities, setTableActivities] = useState([]);
   const [id, setId] = useState("");
   const [name, setName] = useState("");
-  const [category, setCategory] = useState(1);
+  const [code, setCode] = useState("");
+  const [category, setCategory] = useState("");
   const [response, setResponse] = useState(null);
   const [operation, setOperation] = useState(1);
   const [title, setTitle] = useState("");
-  const [busqueda, setBusqueda]= useState("");
+  const [busqueda, setBusqueda] = useState("");
+
+  const {activity} = useParams();
 
   useEffect(() => {
-    handleGetClients();
+    handleGetActivitiesByReport();
   }, []);
 
-  const handleChange=(e)=>{
+  const handleChange = (e) => {
     setBusqueda(e.target.value);
     filtrar(e.target.value);
-  }
+  };
 
-  const filtrar=(terminoBusqueda)=>{
-    var resultadosBusqueda=tablaCliente.filter((client)=>{
-      if(client.name.toString().toLowerCase().includes(terminoBusqueda.toLowerCase())
-      ){
-        return client;
+  const filtrar = (terminoBusqueda) => {
+    var resultadosBusqueda = tableActivities.filter((activity) => {
+      if (
+        activity.name
+          .toString()
+          .toLowerCase()
+          .includes(terminoBusqueda.toLowerCase())
+      ) {
+        return activity;
       }
     });
-    setClients(resultadosBusqueda);
+    setActivities(resultadosBusqueda);
+  };
+
+  async function handleGetActivitiesByReport() {
+    const response = await fetch(
+      `https://api-acca.azurewebsites.net/GetActivitiesByReport?reportId=${activity}`
+    );
+    const data = await response.json();
+    setActivities(data);
+    setTableActivities(data);
   }
 
-  async function handleCreateClient() {
+  async function handleUpdateActivity(id, name, code, category) {
     const data = {
       id: id,
       name: name,
-      clienteCategory: category,
+      code: code,
+      category: category,
     };
 
-    const response = await fetch(
-      "https://api-acca.azurewebsites.net/CreateClient",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
+    try {
+      const response = await fetch(
+        `https://api-acca.azurewebsites.net/EditActivityById/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        }
+      );
+
+      if (response.ok) {
+        // Actualización exitosa
+        handleGetActivitiesByReport();
+
+        // Mostrar alerta
+        Swal.fire({
+          icon: "success",
+          title: "Actividad actualizada!",
+          text: "La actividad se ha actualizado correctamente.",
+        });
+        // Aquí puedes realizar cualquier otra acción necesaria después de la actualización exitosa
+      } else {
+        // Manejo de errores si la respuesta no es exitosa
+        console.log("Error al actualizar la actividad");
       }
-    );
-
-    const responseData = await response.json();
-    setResponse(responseData);
-    // Actualizar la lista de clientes después de crear uno nuevo
-    handleGetClients();
-
-    // Mostrar alerta
-    Swal.fire({
-      icon: "success",
-      title: "¡Cliente creado!",
-      text: "El cliente se ha creado correctamente.",
-    });
+    } catch (error) {
+      // Manejo de errores en caso de una excepción durante la petición
+      console.log("Error en la petición: ", error);
+    }
   }
 
-  async function handleGetClients() {
+  async function handleDeleteActivity(activity) {
     const response = await fetch(
-      "https://api-acca.azurewebsites.net/GetClients"
-    );
-    const data = await response.json();
-    setClients(data);
-    setTablaCliente(data);
-  }
-
-  async function handleDeleteClient(client) {
-    const response = await fetch(
-      `https://api-acca.azurewebsites.net/DeleteClienteById/${client.id}`,
+      `https://api-acca.azurewebsites.net/DeleteActivtyById/${activity.id}`,
       {
         method: "DELETE",
       }
@@ -87,13 +104,13 @@ export const ShowClients = () => {
     setResponse(responseData);
 
     // Actualizar la lista de clientes después de eliminar uno existente
-    handleGetClients();
+    handleGetActivitiesByReport();
 
     // Mostrar alerta
     Swal.fire({
       icon: "success",
-      title: "¡Cliente eliminado!",
-      text: "El cliente se ha eliminado correctamente.",
+      title: "Actividad eliminada!",
+      text: "La actividad se ha eliminado correctamente.",
     });
   }
   function validateFields(name, category) {
@@ -113,59 +130,19 @@ export const ShowClients = () => {
     return { isValid, errors };
   }
 
-  async function handleUpdateClient(id, name, category) {
-    const data = {
-      id: id,
-      name: name,
-      clienteCategory: category
-    };
-  
-    try {
-      const response = await fetch(
-        `https://api-acca.azurewebsites.net/EditClienteById/${id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
-        }
-      );
-  
-      if (response.ok) {
-        // Actualización exitosa
-        handleGetClients();
-
-    // Mostrar alerta
-    Swal.fire({
-      icon: "success",
-      title: "¡Cliente actualizado!",
-      text: "El cliente se ha actualizado correctamente.",
-    });
-        // Aquí puedes realizar cualquier otra acción necesaria después de la actualización exitosa
-      } else {
-        // Manejo de errores si la respuesta no es exitosa
-        console.log("Error al actualizar el cliente");
-      }
-    } catch (error) {
-      // Manejo de errores en caso de una excepción durante la petición
-      console.log("Error en la petición: ", error);
-    }
-  }
-  
-  
-
-  const openModal = (op, id, name, category) => {
+  const openModal = (op, id, name, code, category) => {
     setId("");
     setName("");
+    setCode("");
     setCategory("");
     setOperation(op);
     if (op === 1) {
-      setTitle("Agregar Cliente");
+      setTitle("Agregar Actividad");
     } else if (op === 2) {
-      setTitle("Editar Cliente");
+      setTitle("Editar Actividad");
       setId(id);
       setName(name);
+      setCode(code);
       setCategory(category);
     }
     window.setTimeout(() => {
@@ -179,7 +156,7 @@ export const ShowClients = () => {
         <div className="row mt-3 w-100">
           <div className="col-md-4 offset-4">
             <div className="d-grid mx-auto">
-              <button
+            <button
                 onClick={() => openModal(1)}
                 className="btn btn-dark"
                 data-bs-toggle="modal"
@@ -191,16 +168,16 @@ export const ShowClients = () => {
           </div>
         </div>
         <div className="containerInput">
-        <input
-          className="form-control inputBuscar"
-          value={busqueda}
-          placeholder="Búsqueda"
-          onChange={handleChange}
-        />
-        <button className="btn btn-success">
-        <i class="fa-solid fa-magnifying-glass"></i>
-        </button>
-      </div>
+          <input
+            className="form-control inputBuscar"
+            value={busqueda}
+            placeholder="Búsqueda"
+            onChange={handleChange}
+          />
+          <button className="btn btn-success">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </button>
+        </div>
         <div className="row mt-3">
           <div className="tabla">
             <div className="table-responsive">
@@ -208,37 +185,34 @@ export const ShowClients = () => {
                 <thead>
                   <tr>
                     <th>#</th>
-                    <th>CLIENTES</th>
+                    <th>NOMBRE</th>
+                    <th>CODIGO</th>
                     <th>CATEGORIA</th>
                   </tr>
                 </thead>
                 <tbody className="table-group-divider">
-                  {clients && clients.map((client) => (
-                    <tr key={client.id}>
-                      <td>{client.id}</td>
-                      <td>{client.name}</td>
-                      <td>{ClientsCategory[client.clienteCategory]}</td>
+                  {activities.map((activity) => (
+                    <tr key={activity.id}>
+                      <td>{activity.id}</td>
+                      <td>{activity.name}</td>
+                      <td>{activity.code}</td>
+                      <td>{activity.category}</td>
                       <td>
                         <button
                           onClick={() =>
-                            openModal(
-                              2,
-                              client.id,
-                              client.name,
-                              ClientsCategory[client.clienteCategory]
-                            )
+                            openModal(2, activity.id, activity.name, activity.code, activity.category)
                           }
                           className="btn btn-warning"
                         >
                           <i
                             className="fa-solid fa-edit"
                             data-bs-toggle="modal"
-                            data-bs-target="#modalClients"
+                            data-bs-target="#modalConsultants"
                           ></i>
                         </button>
                         &nbsp;
                         <button
-                          onClick={() => handleDeleteClient(client)}
+                          onClick={() => handleDeleteActivity(activity)}
                           className="btn btn-danger"
                         >
                           <i className="fa-solid fa-trash"></i>
@@ -252,7 +226,7 @@ export const ShowClients = () => {
           </div>
         </div>
       </div>
-      <div id="modalClients" className="modal fade" aria-hidden="true">
+      <div id="modalConsultants" className="modal fade" aria-hidden="true">
         <div className="modal-dialog">
           <div className="modal-content">
             <div className="modal-header">
@@ -268,7 +242,7 @@ export const ShowClients = () => {
               <input type="hidden" id="id"></input>
               <div className="input-group mb-3">
                 <span className="input-group-text">
-                <i class="fa-solid fa-user"></i>
+                  <i class="fa-solid fa-user"></i>
                 </span>
                 <input
                   type="text"
@@ -281,27 +255,33 @@ export const ShowClients = () => {
               </div>
               <div className="input-group mb-3">
                 <span className="input-group-text">
-                <i class="fa-solid fa-bars"></i>
+                  <i class="fa-solid fa-user"></i>
                 </span>
-                <select
+                <input
+                  type="text"
+                  id="code"
+                  className="form-control"
+                  placeholder="Codigo"
+                  value={code}
+                  onChange={(e) => setCode(e.target.value)}
+                ></input>
+              </div>
+              <div className="input-group mb-3">
+                <span className="input-group-text">
+                  <i class="fa-solid fa-user"></i>
+                </span>
+                <input
+                  type="text"
                   id="category"
+                  className="form-control"
+                  placeholder="Categoria"
                   value={category}
-                  onChange={(e) => setCategory(parseInt(e.target.value))}
-                  class="form-select form-select-sm"
-                  aria-label=".form-select-sm example"
-                >
-                  <option selected>Selecciona Categoría</option>
-                  <option value={1}>Gobierno</option>
-                  <option value={2}>Industria</option>
-                  <option value={3}>Petróleo</option>
-                  <option value={4}>Comercio</option>
-                  <option value={5}>Banco</option>
-                  <option value={6}>Seguros</option>
-                </select>
+                  onChange={(e) => setCategory(e.target.value)}
+                ></input>
               </div>
               <div className="d-grid col-6 mx-auto">
                 <button
-                  onClick={() => handleUpdateClient(id, name, category)}
+                  onClick={() => handleUpdateActivity(id, name, code, category)}
                   className="btn btn-success"
                 >
                   <i className="fa-solid fa-check"></i>Editar
@@ -337,7 +317,7 @@ export const ShowClients = () => {
               <input type="hidden" id="id"></input>
               <div className="input-group mb-3">
                 <span className="input-group-text">
-                  <i className="fa-solid fa-user"></i>
+                  <i class="fa-solid fa-user"></i>
                 </span>
                 <input
                   type="text"
@@ -347,34 +327,6 @@ export const ShowClients = () => {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                 ></input>
-              </div>
-              <div className="input-group mb-3">
-                <span className="input-group-text">
-                <i class="fa-solid fa-bars"></i>
-                </span>
-                <select
-                  id="category"
-                  value={category}
-                  onChange={(e) => setCategory(parseInt(e.target.value))}
-                  class="form-select form-select-sm"
-                  aria-label=".form-select-sm example"
-                >
-                  <option selected>Selecciona Categoría</option>
-                  <option value={1}>Gobierno</option>
-                  <option value={2}>Industria</option>
-                  <option value={3}>Petróleo</option>
-                  <option value={4}>Comercio</option>
-                  <option value={5}>Banco</option>
-                  <option value={6}>Seguros</option>
-                </select>
-              </div>
-              <div className="d-grid col-6 mx-auto">
-                <button
-                  onClick={() => handleCreateClient()}
-                  className="btn btn-success"
-                >
-                  <i className="fa-solid fa-check"></i>Guardar
-                </button>
               </div>
             </div>
             <div className="modal-footer">
