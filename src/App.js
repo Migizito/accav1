@@ -10,15 +10,17 @@ import { Bills } from "./components/Bills";
 import { TimeReports } from "./components/TimeReports";
 import { Servicios } from "./components/Servicios";
 import { Activities } from "./components/Activities";
+import { About } from "./components/About";
 function App() {
   return (
     <BrowserRouter>
-      <Navbar />
+      
       <div className="flex">
         <Sidebar />
         <div className="content">
           <Routes>
             <Route path="/" element={<ShowClients />} />
+            <Route path="/about" element={<About />} />
             <Route path="/clientes" element={<ShowClients />} />
             <Route path="/consultores" element={<Consultants />} />
             <Route path="/contratos" element={<Contracts />} />

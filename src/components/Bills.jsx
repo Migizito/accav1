@@ -5,25 +5,36 @@ import { show_alert } from "../functions";
 
 export const Bills = () => {
   const url = "https://api-acca.azurewebsites.net";
-    const [consultants, setConsultants] = useState([]);
+    const [bills, setBills] = useState([]);
     const [id, setId] = useState("");
-    const [name, setName] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [clients, setClients] = useState([]);
+    const [issueDate, setIssueDate] = useState("");
+    const [code, setCode] = useState("");
+    const [note, setNote] = useState("");
+    const [total, setTotal] = useState("");
+    const [clientName, setClientName] = useState("");
     const [response, setResponse] = useState(null);
     const [operation, setOperation] = useState(1);
     const [title, setTitle] = useState("");
   
     useEffect(() => {
-      handleGetConsultants();
+      handleGetBills();
+      handleGetClients();
     }, []);
   
-    async function handleCreateConsultant() {
+    async function handleCreateBill() {
       const data = {
         id: id,
-        name: name,
+        issueDate: issueDate,
+        code: code,
+        note: note,
+        total: total,
+        clientName: clientName,
       };
   
       const response = await fetch(
-        "https://api-acca.azurewebsites.net/CreateConsultant",
+        "https://api-acca.azurewebsites.net/CreateBill",
         {
           method: "POST",
           headers: {
@@ -36,58 +47,35 @@ export const Bills = () => {
       const responseData = await response.json();
       setResponse(responseData);
       // Actualizar la lista de consutlores después de crear uno nuevo
-      handleGetConsultants();
+      handleGetBills();
   
       // Mostrar alerta
       Swal.fire({
         icon: "success",
-        title: "¡Consultor creado!",
-        text: "El consultor se ha creado correctamente.",
+        title: "¡Factura creada!",
+        text: "La Factura se ha creado correctamente.",
       });
     }
   
-    async function handleGetConsultants() {
+    async function handleGetClients() {
       const response = await fetch(
-        "https://api-acca.azurewebsites.net/GetConsultants"
+        "https://api-acca.azurewebsites.net/GetClients"
       );
       const data = await response.json();
-      setConsultants(data);
+      setClients(data);
     }
-  
-    async function handleUpdateConsultants(consultant) {
-      const data = {
-        id: consultant.id,
-        name: consultant.name,
-      };
-  
+
+    async function handleGetBills() {
       const response = await fetch(
-        `https://api-acca.azurewebsites.net/UpdateConsultant/${consultant.id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
-        }
+        "https://api-acca.azurewebsites.net/GetBills"
       );
-  
-      const responseData = await response.json();
-      setResponse(responseData);
-  
-      // Actualizar la lista de clientes después de actualizar uno existente
-      handleGetConsultants();
-  
-      // Mostrar alerta
-      Swal.fire({
-        icon: "success",
-        title: "¡Consultor actualizado!",
-        text: "El consultor se ha actualizado correctamente.",
-      });
+      const data = await response.json();
+      setBills(data);
     }
   
-    async function handleDeleteConsultants(consultant) {
+    async function handleDeleteBill(bill) {
       const response = await fetch(
-        `https://api-acca.azurewebsites.net/DeleteConsultantById/${consultant.id}`,
+        `https://api-acca.azurewebsites.net/DeleteBillById/${bill.id}`,
         {
           method: "DELETE",
         }
@@ -97,13 +85,13 @@ export const Bills = () => {
       setResponse(responseData);
   
       // Actualizar la lista de clientes después de eliminar uno existente
-      handleGetConsultants();
+      handleGetBills();
   
       // Mostrar alerta
       Swal.fire({
         icon: "success",
-        title: "¡Consultor eliminado!",
-        text: "El consultor se ha eliminado correctamente.",
+        title: "Factura eliminada!",
+        text: "La Factura se ha eliminado correctamente.",
       });
     }
     function validateFields(name, category) {
@@ -123,16 +111,28 @@ export const Bills = () => {
       return { isValid, errors };
     }
   
-    const openModal = (op, id, name, category) => {
+    const filteredOptionsClients = clients.filter((client) =>
+    client.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+    const openModal = (op, id, issueDate, code, note, total, clientName) => {
       setId("");
-      setName("");
+      setIssueDate("");
+      setCode("");
+      setNote("");
+      setTotal("");
+      setClientName("");
       setOperation(op);
       if (op === 1) {
         setTitle("Agregar Consultor");
       } else if (op === 2) {
         setTitle("Editar Consultor");
         setId(id);
-        setName(name);
+        setIssueDate(issueDate);
+        setCode(code);
+        setNote(note);
+        setTotal(total);
+        setClientName(clientName);
       }
       window.setTimeout(() => {
         document.getElementById("nombre").focus();
@@ -163,34 +163,27 @@ export const Bills = () => {
                 <thead>
                   <tr>
                     <th>#</th>
-                    <th>CONSULTOR</th>
+                    <th>FECHA</th>
+                    <th>CÓDIGO FACTURA</th>
+                    <th>GLOSA</th>
+                    <th>TOTAL A PAGAR</th>
+                    <th>CLIENTE</th>
                   </tr>
                 </thead>
                 <tbody className="table-group-divider">
-                  {consultants.map((consultant) => (
-                    <tr key={consultant.id}>
-                      <td>{consultant.id}</td>
-                      <td>{consultant.name}</td>
+                  {bills.map((bill) => (
+                    <tr key={bill.id}>
+                      <td>{bill.id}</td>
+                      <td>{bill.issueDate}</td>
+                      <td>{bill.code}</td>
+                      <td>{bill.note}</td>
+                      <td>{bill.total}</td>
+                      <td>{bill.clientName}</td>
                       <td>
-                        <button
-                          onClick={() =>
-                            openModal(
-                              2,
-                              consultant.id,
-                              consultant.name,
-                            )
-                          }
-                          className="btn btn-warning"
-                        >
-                          <i
-                            className="fa-solid fa-edit"
-                            data-bs-toggle="modal"
-                            data-bs-target="#modalProducts"
-                          ></i>
-                        </button>
+                        
                         &nbsp;
                         <button
-                          onClick={() => handleDeleteConsultants(consultant)}
+                          onClick={() => handleDeleteBill(bill)}
                           className="btn btn-danger"
                         >
                           <i className="fa-solid fa-trash"></i>
@@ -226,14 +219,72 @@ export const Bills = () => {
                   type="text"
                   id="nombre"
                   className="form-control"
-                  placeholder="Nombre"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Fecha de Emisión"
+                  value={issueDate}
+                  onChange={(e) => setIssueDate(e.target.value)}
                 ></input>
+              </div>
+              <div className="input-group mb-3">
+                <span className="input-group-text">
+                  <i className="fa-solid fa-gift"></i>
+                </span>
+                <input
+                  type="text"
+                  id="code"
+                  className="form-control"
+                  placeholder="Código"
+                  value={code}
+                  onChange={(e) => setCode(e.target.value)}
+                ></input>
+              </div>
+              <div className="input-group mb-3">
+                <span className="input-group-text">
+                  <i className="fa-solid fa-gift"></i>
+                </span>
+                <input
+                  type="text"
+                  id="note"
+                  className="form-control"
+                  placeholder="Nota"
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                ></input>
+              </div>
+              <div className="input-group mb-3">
+                <span className="input-group-text">
+                  <i className="fa-solid fa-gift"></i>
+                </span>
+                <input
+                  type="text"
+                  id="total"
+                  className="form-control"
+                  placeholder="Total"
+                  value={total}
+                  onChange={(e) => setTotal(e.target.value)}
+                ></input>
+              </div>
+              <div className="input-group mb-3">
+                <span className="input-group-text">
+                  <i class="fa-solid fa-user-plus"></i>
+                </span>
+                <select
+                  id="clientName"
+                  value={clientName}
+                  onChange={(e) => setClientName(e.target.value)}
+                  class="form-select"
+                  aria-label=".form-select-sm example"
+                >
+                  <option selected>Selecciona Cliente</option>
+                  {filteredOptionsClients.map((client) => (
+                    <option key={client.id} value={client.name}>
+                      {client.name}
+                    </option>
+                  ))}
+                </select>
               </div>
               <div className="d-grid col-6 mx-auto">
                 <button
-                  onClick={() => handleCreateConsultant()}
+                  onClick={() => handleCreateBill()}
                   className="btn btn-success"
                 >
                   <i className="fa-solid fa-check"></i>Guardar

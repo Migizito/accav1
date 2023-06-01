@@ -3,24 +3,28 @@ import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { show_alert } from "../functions";
 import { useParams } from "react-router-dom";
+import { act } from "@testing-library/react";
 
 export const Activities = () => {
   const url = "https://api-acca.azurewebsites.net";
   const [activities, setActivities] = useState([]);
+  const [reports, setReports] = useState([]);
   const [tableActivities, setTableActivities] = useState([]);
   const [id, setId] = useState("");
   const [name, setName] = useState("");
   const [code, setCode] = useState("");
   const [category, setCategory] = useState("");
+  const [timeReportId, setTimeReportId] = useState("");
   const [response, setResponse] = useState(null);
   const [operation, setOperation] = useState(1);
   const [title, setTitle] = useState("");
   const [busqueda, setBusqueda] = useState("");
 
-  const {activity} = useParams();
+  const { activity } = useParams();
 
   useEffect(() => {
     handleGetActivitiesByReport();
+    handleGetReports();
   }, []);
 
   const handleChange = (e) => {
@@ -50,6 +54,51 @@ export const Activities = () => {
     setActivities(data);
     setTableActivities(data);
   }
+
+  async function handleGetReports() {
+    const response = await fetch(
+      "https://api-acca.azurewebsites.net/GetReports"
+    );
+    const data = await response.json();
+    setReports(data);
+  }
+
+  async function handleCreateActivity() {
+    const data = {
+      id: id,
+      name: name,
+      code: code,
+      category: category,
+      timeReportId: activity,
+    };
+
+    const response = await fetch(
+      "https://api-acca.azurewebsites.net/CreateActivity",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      }
+    );
+
+    const responseData = await response.json();
+    setResponse(responseData);
+    // Actualizar la lista de consutlores después de crear uno nuevo
+    handleGetActivitiesByReport();
+
+    // Mostrar alerta
+    Swal.fire({
+      icon: "success",
+      title: "Actividad creada!",
+      text: "La actividad se ha creado correctamente.",
+    });
+  }
+
+  const filteredOptionsReport = reports.filter((report) =>
+  report.id == activity
+);
 
   async function handleUpdateActivity(id, name, code, category) {
     const data = {
@@ -94,7 +143,7 @@ export const Activities = () => {
 
   async function handleDeleteActivity(activity) {
     const response = await fetch(
-      `https://api-acca.azurewebsites.net/DeleteActivtyById/${activity.id}`,
+      `https://api-acca.azurewebsites.net/DeleteActivityById/${activity.id}`,
       {
         method: "DELETE",
       }
@@ -130,7 +179,7 @@ export const Activities = () => {
     return { isValid, errors };
   }
 
-  const openModal = (op, id, name, code, category) => {
+  const openModal = (op, id, name, code, timeReportId) => {
     setId("");
     setName("");
     setCode("");
@@ -144,6 +193,7 @@ export const Activities = () => {
       setName(name);
       setCode(code);
       setCategory(category);
+      setTimeReportId(timeReportId);
     }
     window.setTimeout(() => {
       document.getElementById("nombre").focus();
@@ -156,7 +206,7 @@ export const Activities = () => {
         <div className="row mt-3 w-100">
           <div className="col-md-4 offset-4">
             <div className="d-grid mx-auto">
-            <button
+              <button
                 onClick={() => openModal(1)}
                 className="btn btn-dark"
                 data-bs-toggle="modal"
@@ -200,7 +250,13 @@ export const Activities = () => {
                       <td>
                         <button
                           onClick={() =>
-                            openModal(2, activity.id, activity.name, activity.code, activity.category)
+                            openModal(
+                              2,
+                              activity.id,
+                              activity.name,
+                              activity.code,
+                              activity.category
+                            )
                           }
                           className="btn btn-warning"
                         >
@@ -327,6 +383,41 @@ export const Activities = () => {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                 ></input>
+              </div>
+              <div className="input-group mb-3">
+                <span className="input-group-text">
+                  <i class="fa-solid fa-user"></i>
+                </span>
+                <input
+                  type="text"
+                  id="code"
+                  className="form-control"
+                  placeholder="Código"
+                  value={code}
+                  onChange={(e) => setCode(parseInt(e.target.value))}
+                ></input>
+              </div>
+              <div className="input-group mb-3">
+                <span className="input-group-text">
+                  <i class="fa-solid fa-user"></i>
+                </span>
+                <input
+                  type="text"
+                  id="category"
+                  className="form-control"
+                  placeholder="Categoria"
+                  value={category}
+                  onChange={(e) => setCategory(parseInt(e.target.value))}
+                ></input>
+              </div>
+              
+              <div className="d-grid col-6 mx-auto">
+                <button
+                  onClick={() => handleCreateActivity()}
+                  className="btn btn-success"
+                >
+                  <i className="fa-solid fa-check"></i>Guardar
+                </button>
               </div>
             </div>
             <div className="modal-footer">
