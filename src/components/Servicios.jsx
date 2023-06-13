@@ -375,7 +375,7 @@ export const Servicios = () => {
                   className="form-control"
                   placeholder="Precio"
                   value={price}
-                  onChange={(e) => setName(e.target.value)}
+                  onChange={(e) => setPrice(e.target.value)}
                 ></input>
               </div>
               <div className="input-group mb-3">
@@ -388,7 +388,7 @@ export const Servicios = () => {
                   className="form-control"
                   placeholder="Descripcion"
                   value={description}
-                  onChange={(e) => setName(e.target.value)}
+                  onChange={(e) => setDescription(e.target.value)}
                 ></input>
               </div>
               <div className="d-grid col-6 mx-auto">

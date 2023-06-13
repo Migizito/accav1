@@ -24,7 +24,13 @@ export const TimeReports = () => {
   const [clientName, setClientName] = useState("");
   const [consultantName, setConsultantName] = useState("");
   const [appendixName, setAppendixName] = useState("");
-  const [horas, setHoras] = useState("");
+  const [horas, setHoras] = useState({
+    lunes: 0,
+    martes: 0,
+    miercoles: 0,
+    jueves: 0,
+    viernes: 0,
+  });
   const [observaciones, setObservaciones] = useState("");
   const [firmaEmpleado, setFirmaEmpleado] = useState("");
   const [firmaCliente, setFirmaCliente] = useState("");
@@ -119,7 +125,7 @@ export const TimeReports = () => {
       clientName: clientName,
       consultantName: consultantName,
       appendixName: appendixName,
-      horas: horas,
+      horas: horas.total,
       observaciones: observaciones,
       firmaEmpleado: firmaEmpleado,
       firmaCliente: firmaCliente,
@@ -129,7 +135,7 @@ export const TimeReports = () => {
           name: nameActivity,
           code: codeActivity,
           category: categoryActivity,
-        }
+        },
       ],
     };
 
@@ -243,6 +249,33 @@ export const TimeReports = () => {
     return { isValid, errors };
   }
 
+  const handleInputHoras = (e) => {
+    const { name, value } = e.target;
+    setHoras((prevHoras) => ({
+      ...prevHoras,
+      [name]: parseFloat(value) || 0
+    }));
+  };
+
+  const sumarHoras = () => {
+    let totalHoras = 0;
+    for (let dia in horas) {
+      if (dia !== 'total') {
+        totalHoras += horas[dia];
+      }
+    }
+    setHoras((prevHoras) => ({
+      ...prevHoras,
+      total: totalHoras
+    }));
+    Swal.fire({
+      icon: "success",
+      title: "Horas registradas",
+      text: "Las horas han sido registradas",
+    });
+  };
+
+
   const openModal = (
     op,
     id,
@@ -351,10 +384,14 @@ export const TimeReports = () => {
                       <td>{report.observaciones}</td>
                       <td>{report.firmaEmpleado}</td>
                       <td>
-                            <Link to={`/activities/${report.id}`} className="btn btn-primary" style={{ textDecoration: "none" }}>
-                              <IconName.FaAdjust className="me-2" />
-                              Ver Actividades
-                            </Link>                         
+                        <Link
+                          to={`/activities/${report.id}`}
+                          className="btn btn-primary"
+                          style={{ textDecoration: "none" }}
+                        >
+                          <IconName.FaAdjust className="me-2" />
+                          Ver Actividades
+                        </Link>
                       </td>
                       <td>
                         <button
@@ -518,16 +555,81 @@ export const TimeReports = () => {
               </div>
               <div className="input-group mb-3">
                 <span className="input-group-text">
-                  <i class="fa-sharp fa-solid fa-link"></i>
+                  <i className="fa-sharp fa-solid fa-link"></i>
                 </span>
                 <input
                   type="text"
-                  id="horas"
+                  id="lunes"
+                  name="lunes"
                   className="form-control"
-                  placeholder="Horas"
-                  value={horas}
-                  onChange={(e) => setHoras(e.target.value)}
-                ></input>
+                  placeholder="Horas Lunes"
+                  value={horas.lunes}
+                  onChange={handleInputHoras}
+                />
+              </div>
+              <div className="input-group mb-3">
+                <span className="input-group-text">
+                  <i className="fa-sharp fa-solid fa-link"></i>
+                </span>
+                <input
+                  type="text"
+                  id="martes"
+                  name="martes"
+                  className="form-control"
+                  placeholder="Horas Martes"
+                  value={horas.martes}
+                  onChange={handleInputHoras}
+                />
+              </div>
+              <div className="input-group mb-3">
+                <span className="input-group-text">
+                  <i className="fa-sharp fa-solid fa-link"></i>
+                </span>
+                <input
+                  type="text"
+                  id="miercoles"
+                  name="miercoles"
+                  className="form-control"
+                  placeholder="Horas Miércoles"
+                  value={horas.miercoles}
+                  onChange={handleInputHoras}
+                />
+              </div>
+              <div className="input-group mb-3">
+                <span className="input-group-text">
+                  <i className="fa-sharp fa-solid fa-link"></i>
+                </span>
+                <input
+                  type="text"
+                  id="jueves"
+                  name="jueves"
+                  className="form-control"
+                  placeholder="Horas Jueves"
+                  value={horas.jueves}
+                  onChange={handleInputHoras}
+                />
+              </div>
+              <div className="input-group mb-3">
+                <span className="input-group-text">
+                  <i className="fa-sharp fa-solid fa-link"></i>
+                </span>
+                <input
+                  type="text"
+                  id="viernes"
+                  name="viernes"
+                  className="form-control"
+                  placeholder="Horas Viernes"
+                  value={horas.viernes}
+                  onChange={handleInputHoras}
+                />
+              </div>
+              <div className="d-grid col-6 mx-auto">
+                <button
+                  onClick={sumarHoras}
+                  className="btn btn-success"
+                >
+                  <i className="fa-solid fa-check"></i>Completar Horas
+                </button>
               </div>
               <div className="input-group mb-3">
                 <span className="input-group-text">
@@ -566,45 +668,6 @@ export const TimeReports = () => {
                   placeholder="Firma Cliente"
                   value={firmaCliente}
                   onChange={(e) => setFirmaCliente(e.target.value)}
-                ></input>
-              </div>
-              <div className="input-group mb-3">
-                <span className="input-group-text">
-                  <i class="fa-solid fa-comments"></i>{" "}
-                </span>
-                <input
-                  type="text"
-                  id="nameActivity"
-                  className="form-control"
-                  placeholder="Nombre Actividad"
-                  value={nameActivity}
-                  onChange={(e) => setNameActivity(e.target.value)}
-                ></input>
-              </div>
-              <div className="input-group mb-3">
-                <span className="input-group-text">
-                  <i class="fa-solid fa-comments"></i>{" "}
-                </span>
-                <input
-                  type="text"
-                  id="codeActivity"
-                  className="form-control"
-                  placeholder="Codigo Actividad"
-                  value={codeActivity}
-                  onChange={(e) => setCodeActivity(e.target.value)}
-                ></input>
-              </div>
-              <div className="input-group mb-3">
-                <span className="input-group-text">
-                  <i class="fa-solid fa-comments"></i>{" "}
-                </span>
-                <input
-                  type="text"
-                  id="categoryActivity"
-                  className="form-control"
-                  placeholder="Categoria Actividad"
-                  value={categoryActivity}
-                  onChange={(e) => setCategoryActivity(e.target.value)}
                 ></input>
               </div>
               <div className="d-grid col-6 mx-auto">
